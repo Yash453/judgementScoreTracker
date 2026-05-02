@@ -1,0 +1,78 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+  html,
+  body,
+  #root {
+    height: 100%;
+  }
+  body {
+    background:
+      radial-gradient(1200px 600px at 10% -10%, rgba(31, 110, 67, 0.18), transparent 60%),
+      radial-gradient(900px 500px at 110% 10%, rgba(231, 184, 75, 0.08), transparent 60%),
+      linear-gradient(180deg, #0b0f14 0%, #060a10 100%);
+    background-attachment: fixed;
+  }
+}
+
+@layer components {
+  .surface {
+    @apply bg-ink-800/70 backdrop-blur-md ring-1 ring-white/5 shadow-card rounded-2xl;
+  }
+  .chip {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-white/10;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center rounded-xl px-4 py-2.5 text-sm font-semibold
+      transition-all focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold/70
+      disabled:cursor-not-allowed disabled:opacity-50;
+  }
+  .btn-primary {
+    @apply btn bg-felt-500 text-white hover:bg-felt-400 active:bg-felt-600 shadow-soft;
+  }
+  .btn-secondary {
+    @apply btn bg-ink-700 text-ink-100 hover:bg-ink-600 ring-1 ring-white/5;
+  }
+  .btn-ghost {
+    @apply btn bg-transparent text-ink-200 hover:bg-white/5;
+  }
+  .btn-danger {
+    @apply btn bg-accent-rose/90 text-white hover:bg-accent-rose;
+  }
+  .input {
+    @apply w-full rounded-xl bg-ink-900/60 px-3.5 py-2.5 text-sm text-ink-100 ring-1 ring-white/10
+      placeholder:text-ink-400 focus:outline-none focus:ring-2 focus:ring-felt-400;
+  }
+  .label {
+    @apply text-xs font-medium uppercase tracking-wider text-ink-300;
+  }
+  .pad-btn {
+    @apply flex h-12 min-w-[3rem] items-center justify-center rounded-xl text-base font-semibold
+      ring-1 ring-white/10 transition-all
+      focus:outline-none focus-visible:ring-2 focus-visible:ring-accent-gold/70;
+  }
+}
+
+.suit-red {
+  color: #ff6b6b;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+.suit-black {
+  color: #f1f5ff;
+  text-shadow: 0 1px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* Hide number input spinners — we use custom +/- pads */
+input[type='number']::-webkit-outer-spin-button,
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}
