@@ -20,7 +20,10 @@ type Actions = {
   startGame: (players: Player[], config?: Partial<GameConfig>) => void;
   abandonGame: () => void;
   setBid: (playerId: string, bid: number) => { ok: true } | { ok: false; reason: string };
+  undoLastBid: () => void;
+  clearBidFrom: (playerId: string) => void;
   finishBidding: () => { ok: true } | { ok: false; reason: string };
+  backToBidding: () => void;
   setTricks: (playerId: string, tricks: number) => void;
   submitTricks: () => { ok: true } | { ok: false; reason: string };
   goToPreviousRound: () => void;
@@ -98,6 +101,46 @@ export const useGameStore = create<State & Actions>()(
         return { ok: true };
       },
 
+      undoLastBid: () => {
+        const game = get().currentGame;
+        if (!game) return;
+        const round = game.rounds[game.currentRoundIndex]!;
+        if (round.phase !== 'bidding') return;
+        let lastIdx = -1;
+        for (let i = round.results.length - 1; i >= 0; i--) {
+          if (round.results[i]!.bid !== null) {
+            lastIdx = i;
+            break;
+          }
+        }
+        if (lastIdx === -1) return;
+        set({
+          currentGame: updateCurrentRound(game, (r) => ({
+            ...r,
+            results: r.results.map((res, i) =>
+              i === lastIdx ? { ...res, bid: null } : res,
+            ),
+          })),
+        });
+      },
+
+      clearBidFrom: (playerId) => {
+        const game = get().currentGame;
+        if (!game) return;
+        const round = game.rounds[game.currentRoundIndex]!;
+        if (round.phase !== 'bidding') return;
+        const idx = round.results.findIndex((r) => r.playerId === playerId);
+        if (idx === -1) return;
+        set({
+          currentGame: updateCurrentRound(game, (r) => ({
+            ...r,
+            results: r.results.map((res, i) =>
+              i >= idx ? { ...res, bid: null } : res,
+            ),
+          })),
+        });
+      },
+
       finishBidding: () => {
         const game = get().currentGame;
         if (!game) return { ok: false, reason: 'No active game.' };
@@ -109,6 +152,16 @@ export const useGameStore = create<State & Actions>()(
           currentGame: updateCurrentRound(game, (r) => ({ ...r, phase: 'playing' })),
         });
         return { ok: true };
+      },
+
+      backToBidding: () => {
+        const game = get().currentGame;
+        if (!game) return;
+        const round = game.rounds[game.currentRoundIndex]!;
+        if (round.phase !== 'playing') return;
+        set({
+          currentGame: updateCurrentRound(game, (r) => ({ ...r, phase: 'bidding' })),
+        });
       },
 
       setTricks: (playerId, tricks) => {
