@@ -31,6 +31,19 @@ npm run build        # type-check + production build to ./dist
 npm run preview      # preview the production build
 ```
 
+## Deploy
+
+A GitHub Actions workflow (`.github/workflows/pages.yml`) builds and deploys
+to GitHub Pages on every push to `main`. To turn it on:
+
+1. **Settings → Pages → Build and deployment → Source: GitHub Actions**.
+2. Merge to `main` (or use *Actions → Deploy to GitHub Pages → Run workflow*).
+3. Site will be live at `https://<owner>.github.io/<repo>/`.
+
+The workflow exports `BASE_PATH=/<repo>/` to Vite so all asset URLs resolve
+correctly under the repo subpath. Routing uses `HashRouter`, so deep links
+work without a SPA-fallback `404.html`.
+
 ## Stack
 
 React 18 · Vite · TypeScript · Tailwind CSS · Zustand (with `persist`) · Vitest + Testing Library
