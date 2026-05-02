@@ -10,7 +10,10 @@ export const Game = () => {
   const navigate = useNavigate();
   const game = useGameStore((s) => s.currentGame);
   const setBid = useGameStore((s) => s.setBid);
+  const undoLastBid = useGameStore((s) => s.undoLastBid);
+  const clearBidFrom = useGameStore((s) => s.clearBidFrom);
   const finishBidding = useGameStore((s) => s.finishBidding);
+  const backToBidding = useGameStore((s) => s.backToBidding);
   const setTricks = useGameStore((s) => s.setTricks);
   const submitTricks = useGameStore((s) => s.submitTricks);
   const goToPreviousRound = useGameStore((s) => s.goToPreviousRound);
@@ -34,6 +37,7 @@ export const Game = () => {
 
   const tricksTotal = round.results.reduce((s, r) => s + (r.tricks ?? 0), 0);
   const tricksValid = validateTricks(round).valid;
+  const anyBidPlaced = round.results.some((r) => r.bid !== null);
 
   const handleBid = (n: number) => {
     if (!nextBidder) return;
@@ -92,13 +96,12 @@ export const Game = () => {
                 const player = game.players.find((p) => p.id === r.playerId);
                 const isNext = i === nextBidderIdx;
                 const isDealer = r.playerId === round.dealerId;
-                return (
-                  <li
-                    key={r.playerId}
-                    className={`flex items-center justify-between rounded-lg px-3 py-2 ${
-                      isNext ? 'bg-felt-700/30 ring-1 ring-felt-400/40' : 'bg-ink-900/40'
-                    }`}
-                  >
+                const hasBid = r.bid !== null;
+                const rowClass = `flex w-full items-center justify-between rounded-lg px-3 py-2 text-left ${
+                  isNext ? 'bg-felt-700/30 ring-1 ring-felt-400/40' : 'bg-ink-900/40'
+                } ${hasBid ? 'cursor-pointer hover:bg-ink-700/60 transition' : ''}`;
+                const inner = (
+                  <>
                     <span className="flex items-center gap-2">
                       <span className="text-ink-200">{player?.name}</span>
                       {isDealer && (
@@ -110,9 +113,30 @@ export const Game = () => {
                         <span className="chip bg-felt-500 text-white">Bidding</span>
                       )}
                     </span>
-                    <span className="font-display text-lg font-bold tabular-nums">
+                    <span className="flex items-center gap-2 font-display text-lg font-bold tabular-nums">
                       {r.bid === null ? '—' : r.bid}
+                      {hasBid && (
+                        <span className="text-xs font-normal text-ink-400" aria-hidden>
+                          ✎
+                        </span>
+                      )}
                     </span>
+                  </>
+                );
+                return (
+                  <li key={r.playerId}>
+                    {hasBid ? (
+                      <button
+                        type="button"
+                        onClick={() => clearBidFrom(r.playerId)}
+                        className={rowClass}
+                        aria-label={`Edit ${player?.name}'s bid`}
+                      >
+                        {inner}
+                      </button>
+                    ) : (
+                      <div className={rowClass}>{inner}</div>
+                    )}
                   </li>
                 );
               })}
@@ -135,11 +159,30 @@ export const Game = () => {
                   forbidden={forbidden}
                   onSelect={handleBid}
                 />
+                {anyBidPlaced && (
+                  <button
+                    onClick={() => undoLastBid()}
+                    className="btn-ghost mt-3 w-full text-sm"
+                  >
+                    ← Undo last bid
+                  </button>
+                )}
               </div>
             ) : (
-              <button onClick={handleFinishBidding} className="btn-primary w-full">
-                Lock bids · start playing
-              </button>
+              <>
+                <button onClick={handleFinishBidding} className="btn-primary w-full">
+                  Lock bids · start playing
+                </button>
+                <button
+                  onClick={() => undoLastBid()}
+                  className="btn-ghost mt-2 w-full text-sm"
+                >
+                  ← Undo last bid
+                </button>
+                <p className="mt-2 text-center text-xs text-ink-400">
+                  Tap any bid above to edit it.
+                </p>
+              </>
             )}
           </>
         )}
@@ -193,6 +236,12 @@ export const Game = () => {
               {game.currentRoundIndex === game.rounds.length - 1
                 ? 'Finish game'
                 : 'Save round → next'}
+            </button>
+            <button
+              onClick={() => backToBidding()}
+              className="btn-ghost mt-2 w-full text-sm"
+            >
+              ← Edit bids (this round)
             </button>
             {game.currentRoundIndex > 0 && (
               <button
