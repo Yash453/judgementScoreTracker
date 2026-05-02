@@ -15,7 +15,7 @@ export const Home = () => {
           <span className="suit-red">♥</span>
         </div>
         <h1 className="font-display text-4xl font-bold tracking-tight">Judgement</h1>
-        <p className="mt-2 text-ink-300">Score tracker for Kachi Fuali</p>
+        <p className="mt-2 text-ink-300">Judgement score tracker</p>
       </header>
 
       <div className="surface flex flex-col gap-3 p-5">
