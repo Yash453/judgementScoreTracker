@@ -133,12 +133,12 @@ export const allBidsPlaced = (round: Round): boolean =>
 export const validateTricks = (round: Round): ValidationResult => {
   const total = round.results.reduce((sum, r) => sum + (r.tricks ?? 0), 0);
   if (round.results.some((r) => r.tricks === null)) {
-    return { valid: false, reason: 'Enter tricks for every player.' };
+    return { valid: false, reason: 'Enter hands for every player.' };
   }
   if (total !== round.cardsPerPlayer) {
     return {
       valid: false,
-      reason: `Total tricks (${total}) must equal cards dealt (${round.cardsPerPlayer}).`,
+      reason: `Total hands (${total}) must equal cards dealt (${round.cardsPerPlayer}).`,
     };
   }
   return { valid: true };

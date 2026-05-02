@@ -147,7 +147,7 @@ export const Game = () => {
         {round.phase === 'playing' && (
           <>
             <div className="mb-3 flex items-baseline justify-between">
-              <h3 className="font-display text-lg font-bold">Tricks won</h3>
+              <h3 className="font-display text-lg font-bold">Hands won</h3>
               <span className="text-sm text-ink-300">
                 Total:{' '}
                 <strong
